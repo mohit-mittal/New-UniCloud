@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@color/wallet_holo_blue_light">
+
+    <TextView android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/Welcome"
+        android:textSize="100px"
+        android:textColor="@android:color/white"
+        android:id="@+id/welcomeText"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:autoText="false" />
+
+
+
+</RelativeLayout>
