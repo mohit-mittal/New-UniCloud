@@ -1,7 +1,12 @@
 package com.unicloud.mittal;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
@@ -19,6 +24,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
@@ -64,6 +72,14 @@ public class loginWithGooglePlus extends Activity implements OnClickListener,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_with_google_plus);
+
+        /**
+         * Initializes the sync client. This must be call before we can use it.
+         */
+
+//        new CognitoSyncClientManager().execute();
+        CognitoSyncClientManager task = new CognitoSyncClientManager(this);
+        task.execute();
 
         btnSignIn = (SignInButton) findViewById(R.id.btn_sign_in);
         btnSignOut = (Button) findViewById(R.id.btn_sign_out);
@@ -221,6 +237,64 @@ public class loginWithGooglePlus extends Activity implements OnClickListener,
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        // On Android you can retrieve the Google authentication token from the
+// Google Play Services object
+        GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
+        AccountManager am = AccountManager.get(this);
+
+        final Account[] accounts = am.getAccountsByType(GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
+
+        AsyncTask<Void, Void, String> task2 = new AsyncTask<Void, Void, String>() {
+            public static final int REQUEST_CODE_TOKEN_AUTH = 100;
+
+            @Override
+            protected String doInBackground(Void... params) {
+                Log.i("test", "function starts");
+                String mScope="audience:server:client_id:899555500747-38rpnq51of946grhdvofck7r8u5p09cd.apps.googleusercontent.com:api_scope:https://www.googleapis.com/auth/plus.login";
+                String SCOPE = "oauth2:https://www.googleapis.com/auth/plus.login";
+                // Get the token for the current user
+                String token = null;
+                Log.i("test", "before try begins");
+                try {
+                    Log.i("test", "try begins");
+                    token = GoogleAuthUtil.getToken(getApplicationContext(),
+                            accounts[0].name, SCOPE);
+                    Log.i("G token", token);
+//                    Log.i("person name ", String.valueOf(Plus.PeopleApi.getCurrentPerson(mGoogleApiClient).getDisplayName()));
+                } catch (IOException transientEx) {
+                    Log.i("test", "IO catch begins");
+                    // Network or server error, try later
+                    Log.e(TAG, transientEx.toString());
+                } catch (UserRecoverableAuthException e) {
+                    // Recover (with e.getIntent())
+                    Log.e(TAG, e.toString());
+                    Intent recover = e.getIntent();
+                    startActivityForResult(recover, REQUEST_CODE_TOKEN_AUTH );
+                } catch (GoogleAuthException authEx) {
+                    // The call is not ever expected to succeed
+                    // assuming you have already verified that
+                    // Google Play services is installed.
+                    Log.i("test", "Google Auth catch begins");
+                    Log.e(TAG, authEx.toString());
+                }
+                return token;
+            }
+            @Override
+            protected void onPostExecute(String token) {
+                Log.i(TAG, "Access token retrieved:" + token);
+
+                CognitoSyncClientManager.addLogins("accounts.google.com", token);
+            }
+
+        };
+        task2.execute();
+//        String pName =  String.valueOf(Plus.PeopleApi.getCurrentPerson(mGoogleApiClient).getDisplayName());
+//        Toast.makeText(this, "Welcome " +pName, Toast.LENGTH_LONG).show();
+//        Log.i(TAG, "Google token: " + token);
+//        CognitoSyncClientManager.addLogins("accounts.google.com", token);
+
+
     }
 
     @Override

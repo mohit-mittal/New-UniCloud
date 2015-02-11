@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 
 public class Splash extends Activity {
 
@@ -15,6 +16,8 @@ public class Splash extends Activity {
 		setContentView(R.layout.splash);
 //		backgroundMusic = MediaPlayer.create(Splash.this, R.raw.welcome);
 //		backgroundMusic.start();
+//        Log.i("splash","This is a test" );
+
 		Thread timer = new Thread() {
 			public void run() {
 				try{
