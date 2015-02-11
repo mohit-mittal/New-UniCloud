@@ -40,8 +40,6 @@ import com.google.android.gms.plus.model.people.Person;
 
 public class loginWithGooglePlus extends Activity implements OnClickListener,
         ConnectionCallbacks, OnConnectionFailedListener {
-    // code from here
-    // http://www.androidhive.info/2014/02/android-login-with-google-plus-account-1/
     private static final int RC_SIGN_IN = 0;
     // Logcat tag
     private static final String TAG = "loginWithGooglePlus";
